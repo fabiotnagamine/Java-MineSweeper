@@ -18,7 +18,7 @@ class CampoTeste {
 	    }
 
 	    // =========================
-	    // VIZINHOS VÁLIDOS (8)
+	    // VIZINHOS
 	    // =========================
 
 	    @Test
@@ -70,7 +70,7 @@ class CampoTeste {
 	    }
 
 	    // =========================
-	    // NÃO VIZINHOS
+	    // NÃO VIZINHOS EM OUTRAS POSIÇÕES
 	    // =========================
 
 	    @Test
