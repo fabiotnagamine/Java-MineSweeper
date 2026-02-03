@@ -15,12 +15,12 @@ public class Campo {
 	private final int linha;
 	private final int coluna;
 
-	public Campo(int linha, int coluna) {
+	Campo(int linha, int coluna) {
 		this.linha = linha;
 		this.coluna = coluna;
 	}
 
-	public boolean adicionarVizinho(Campo vizinho) {
+	boolean adicionarVizinho(Campo vizinho) {
 		if (ehVizinho(vizinho)) {
 			vizinhos.add(vizinho);
 			return true;
@@ -28,37 +28,60 @@ public class Campo {
 		return false;
 	}
 
-	private boolean ehVizinho(Campo c) {
+	boolean ehVizinho(Campo c) {
 		int dl = Math.abs(linha - c.linha);
 		int dc = Math.abs(coluna - c.coluna);
 		return dl <= 1 && dc <= 1 && !(dl == 0 && dc == 0);
 	}
 
-	public void alternarMarcacao() {
+	void alternarMarcacao() {
 		if (!aberto) {
 			marcado = !marcado;
 		}
 	}
 
-	public boolean abrir() {
+	boolean abrir() {
 		if (aberto == false && marcado == false) {
 			aberto = true;
 			if (minado == true) {
 				throw new ExplosaoException("Game Over");
 			}
-			
-			if(checarVizinhos()) {
+
+			if (checarVizinhos()) {
 				vizinhos.forEach(vizinho -> vizinho.abrir());
 			}
-			
-			return true;
-		}
 
-		return false;
+			return true;
+		} else
+			return false;
 	}
-	
+
 	public boolean checarVizinhos() {
 		return vizinhos.stream().noneMatch(vizinho -> vizinho.minado);
+	}
+
+	void minar() {
+		minado = true;
+	}
+
+	boolean isMarcado() {
+		return marcado;
+	}
+
+	boolean objetivoCumprido() {
+		boolean revelado = !minado && aberto;
+		boolean protegido = minado && marcado;
+		return revelado || protegido;
+	}
+
+	long minadoVizinhos() {
+		return vizinhos.stream().filter(v -> v.minado).count();
+	}
+
+	void reiniciar() {
+		aberto = false;
+		minado = false;
+		marcado = false;
 	}
 
 }

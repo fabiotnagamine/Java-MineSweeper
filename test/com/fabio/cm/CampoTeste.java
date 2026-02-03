@@ -1,112 +1,148 @@
 package com.fabio.cm;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fabio.cm.exception.ExplosaoException;
 import com.fabio.cm.model.Campo;
 
 class CampoTeste {
 
-	 private Campo campoCentral;
+    private Campo campo;
 
-	    @BeforeEach
-	    void iniciarCampo() {
-	        campoCentral = new Campo(3, 3);
-	    }
+    @BeforeEach
+    void iniciarCampo() {
+        campo = new Campo(3, 3);
+    }
 
-	    // =========================
-	    // VIZINHOS
-	    // =========================
+    // =========================
+    // Testes de vizinhança
+    // =========================
 
-	    @Test
-	    void deveAdicionarVizinhoCima() {
-	        Campo vizinho = new Campo(2, 3);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveAdicionarVizinhoHorizontal() {
+        Campo vizinho = new Campo(3, 4);
+        assertTrue(campo.adicionarVizinho(vizinho));
+    }
 
-	    @Test
-	    void deveAdicionarVizinhoBaixo() {
-	        Campo vizinho = new Campo(4, 3);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveAdicionarVizinhoVertical() {
+        Campo vizinho = new Campo(4, 3);
+        assertTrue(campo.adicionarVizinho(vizinho));
+    }
 
-	    @Test
-	    void deveAdicionarVizinhoEsquerda() {
-	        Campo vizinho = new Campo(3, 2);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveAdicionarVizinhoDiagonal() {
+        Campo vizinho = new Campo(4, 4);
+        assertTrue(campo.adicionarVizinho(vizinho));
+    }
 
-	    @Test
-	    void deveAdicionarVizinhoDireita() {
-	        Campo vizinho = new Campo(3, 4);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void naoDeveAdicionarVizinhoDistante() {
+        Campo vizinho = new Campo(5, 5);
+        assertFalse(campo.adicionarVizinho(vizinho));
+    }
 
-	    @Test
-	    void deveAdicionarVizinhoDiagonalSuperiorEsquerda() {
-	        Campo vizinho = new Campo(2, 2);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void naoDeveAdicionarEleMesmoComoVizinho() {
+        Campo vizinho = new Campo(3, 3);
+        assertFalse(campo.adicionarVizinho(vizinho));
+    }
 
-	    @Test
-	    void deveAdicionarVizinhoDiagonalSuperiorDireita() {
-	        Campo vizinho = new Campo(2, 4);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    // =========================
+    // Testes de marcação
+    // =========================
 
-	    @Test
-	    void deveAdicionarVizinhoDiagonalInferiorEsquerda() {
-	        Campo vizinho = new Campo(4, 2);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveAlternarMarcacao() {
+        campo.alternarMarcacao();
+        assertTrue(campo.isMarcado());
 
-	    @Test
-	    void deveAdicionarVizinhoDiagonalInferiorDireita() {
-	        Campo vizinho = new Campo(4, 4);
-	        assertTrue(campoCentral.adicionarVizinho(vizinho));
-	    }
+        campo.alternarMarcacao();
+        assertFalse(campo.isMarcado());
+    }
 
-	    // =========================
-	    // NÃO VIZINHOS EM OUTRAS POSIÇÕES
-	    // =========================
+    @Test
+    void naoDeveMarcarCampoAberto() {
+        campo.abrir();
+        campo.alternarMarcacao();
+        assertFalse(campo.isMarcado());
+    }
 
-	    @Test
-	    void naoDeveAdicionarOProprioCampo() {
-	        Campo vizinho = new Campo(3, 3);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    // =========================
+    // Testes de abertura
+    // =========================
 
-	    @Test
-	    void naoDeveAdicionarCampoMuitoAcima() {
-	        Campo vizinho = new Campo(1, 3);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveAbrirCampoNaoMinadoENaoMarcado() {
+        assertTrue(campo.abrir());
+    }
 
-	    @Test
-	    void naoDeveAdicionarCampoMuitoAbaixo() {
-	        Campo vizinho = new Campo(5, 3);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void naoDeveAbrirCampoMarcado() {
+        campo.alternarMarcacao();
+        assertFalse(campo.abrir());
+    }
 
-	    @Test
-	    void naoDeveAdicionarCampoMuitoEsquerda() {
-	        Campo vizinho = new Campo(3, 1);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void naoDeveAbrirCampoJaAberto() {
+        campo.abrir();
+        assertFalse(campo.abrir());
+    }
 
-	    @Test
-	    void naoDeveAdicionarCampoMuitoDireita() {
-	        Campo vizinho = new Campo(3, 5);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    // =========================
+    // Testes de explosão
+    // =========================
 
-	    @Test
-	    void naoDeveAdicionarDiagonalDistante() {
-	        Campo vizinho = new Campo(5, 5);
-	        assertFalse(campoCentral.adicionarVizinho(vizinho));
-	    }
+    @Test
+    void deveLancarExplosaoAoAbrirCampoMinado() {
+        campo.minar();
+        assertThrows(ExplosaoException.class, () -> campo.abrir());
+    }
 
+    // =========================
+    // Testes de vizinhos minados
+    // =========================
+
+    @Test
+    void deveAbrirVizinhosQuandoNaoHaMinasAoRedor() {
+        Campo campo11 = new Campo(1, 1);
+        Campo campo12 = new Campo(1, 2);
+        Campo campo22 = new Campo(2, 2);
+
+        campo11.adicionarVizinho(campo12);
+        campo11.adicionarVizinho(campo22);
+
+        campo12.adicionarVizinho(campo11);
+        campo12.adicionarVizinho(campo22);
+
+        campo22.adicionarVizinho(campo11);
+        campo22.adicionarVizinho(campo12);
+
+        campo11.abrir();
+
+        assertTrue(campo12.abrir() == false); // já abriu via recursão
+        assertTrue(campo22.abrir() == false); // já abriu via recursão
+    }
+
+    @Test
+    void naoDeveAbrirVizinhosQuandoHaMinaAoRedor() {
+        Campo campoCentral = new Campo(2, 2);
+        Campo vizinho = new Campo(2, 3);
+
+        vizinho.minar();
+
+        campoCentral.adicionarVizinho(vizinho);
+
+        campoCentral.abrir();
+
+        assertFalse(vizinho.abrir()); // não abriu automaticamente
+    }
+
+
+	    
 }
