@@ -13,6 +13,7 @@ public class Campo {
 	private List<Campo> vizinhos = new ArrayList<>();
 
 	private final int linha;
+	
 	private final int coluna;
 
 	Campo(int linha, int coluna) {
@@ -60,11 +61,15 @@ public class Campo {
 		return vizinhos.stream().noneMatch(vizinho -> vizinho.minado);
 	}
 
-	void minar() {
+	public void minar() {
 		minado = true;
 	}
+	
+	public boolean isMinado() {
+		return minado;
+	}
 
-	boolean isMarcado() {
+	public boolean isMarcado() {
 		return marcado;
 	}
 
@@ -82,6 +87,29 @@ public class Campo {
 		aberto = false;
 		minado = false;
 		marcado = false;
+	}
+	
+	public int getLinha() {
+		return linha;
+	}
+
+	public int getColuna() {
+		return coluna;
+	}
+
+	
+	public String toString() {
+		if(marcado) {
+			return "x";
+		}else if(aberto && minado) {
+			return "#";
+		}else if(aberto && minadoVizinhos() > 0) {
+			return Long.toString(minadoVizinhos());
+		}else if(aberto) {
+			return " ";
+		}else {
+			return "?";
+		}
 	}
 
 }
